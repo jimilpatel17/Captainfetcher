@@ -362,32 +362,58 @@ function startSpinner() {
     [players[i], players[j]] = [players[j], players[i]];
   }
 
-  // Rig for Jimil and Romit if both are present
-  const jIndex = players.findIndex(p => p.toLowerCase() === 'jimil');
-  const rIndex = players.findIndex(p => p.toLowerCase() === 'romit');
-  const neIndex = players.findIndex(p => ['ne', 'northeast'].includes(p.toLowerCase()));
+  // Collect rigged players
+  const riggedNamesLower = ['jimil', 'romit', 'ne', 'northeast'];
+  const presentRigged = [];
   
-  if (jIndex !== -1 && rIndex !== -1) {
-    const jName = players[jIndex];
-    players.splice(jIndex, 1);
-    const rIndexNew = players.findIndex(p => p.toLowerCase() === 'romit');
-    const rName = players[rIndexNew];
-    players.splice(rIndexNew, 1);
-    
-    players.unshift(jName);
-    
-    let targetRIndex = 1;
-    if (n >= 2) {
-      targetRIndex = Math.floor(0.5 + m / n) % m;
-      if (targetRIndex === 0) targetRIndex = 1;
+  for (let i = players.length - 1; i >= 0; i--) {
+    const pLower = players[i].toLowerCase();
+    if (riggedNamesLower.includes(pLower)) {
+      presentRigged.push(players[i]);
+      players.splice(i, 1);
     }
-    targetRIndex = Math.min(targetRIndex, players.length);
-    players.splice(targetRIndex, 0, rName);
-  } else if (neIndex !== -1) {
-    // Rig for NE / northeast
-    const neName = players[neIndex];
-    players.splice(neIndex, 1);
-    players.unshift(neName); // Place at index 0 to win on Selector 0
+  }
+
+  if (presentRigged.length > 0) {
+    // Sort by priority (Jimil > Romit > NE)
+    presentRigged.sort((a, b) => {
+      const rank = p => {
+        const l = p.toLowerCase();
+        if (l === 'jimil') return 1;
+        if (l === 'romit') return 2;
+        if (l === 'ne' || l === 'northeast') return 3;
+        return 4;
+      };
+      return rank(a) - rank(b);
+    });
+
+    const finalPlayers = new Array(m).fill(null);
+    
+    // Place rigged players at the correct indices for selectors
+    for (let i = 0; i < presentRigged.length; i++) {
+      if (i < n) {
+        let targetIndex = Math.floor(0.5 + i * m / n) % m;
+        while (finalPlayers[targetIndex] !== null) {
+          targetIndex = (targetIndex + 1) % m;
+        }
+        finalPlayers[targetIndex] = presentRigged[i];
+      }
+    }
+    
+    // Put any remaining rigged players into the unrigged pool
+    for (let i = n; i < presentRigged.length; i++) {
+      players.push(presentRigged[i]);
+    }
+    
+    // Fill the null slots with unrigged players
+    let pIdx = 0;
+    for (let i = 0; i < m; i++) {
+      if (finalPlayers[i] === null) {
+        finalPlayers[i] = players[pIdx++];
+      }
+    }
+    
+    players = finalPlayers;
   }
 
   numSelectors = n;
@@ -503,11 +529,9 @@ function spinWheel() {
   document.getElementById('resultsCard').style.display = 'none';
 
   let targetAngle;
-  const hasJimil = players.some(p => p.toLowerCase() === 'jimil');
-  const hasRomit = players.some(p => p.toLowerCase() === 'romit');
-  const hasNE = players.some(p => ['ne', 'northeast'].includes(p.toLowerCase()));
+  const hasRigged = players.some(p => ['jimil', 'romit', 'ne', 'northeast'].includes(p.toLowerCase()));
 
-  if (isFirstSpin && ((hasJimil && hasRomit) || hasNE)) {
+  if (isFirstSpin && hasRigged) {
     const sliceAngle = (2 * Math.PI) / players.length;
     // Add a tiny offset (-0.01) to ensure floating point division lands cleanly inside the desired slice
     const desiredAngle = -Math.PI / 2 - (sliceAngle / 2) - 0.01;
