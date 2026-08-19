@@ -1,315 +1,561 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Spinner Wheel – Player Selector</title>
+
 <meta name="description" content="A fun spinner wheel game to randomly select players using configurable selectors.">
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+
 <style>
+
   /* ── Reset & Base ──────────────────────────────── */
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   html { font-size: 16px; }
+
   body {
+
     font-family: 'Outfit', sans-serif;
+
     min-height: 100vh;
+
     background: #0b0e17;
+
     color: #e8e8f0;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     overflow-x: hidden;
+
   }
 
   /* Animated gradient background */
+
   body::before {
+
     content: '';
+
     position: fixed; inset: 0;
+
     background:
+
       radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,.25) 0%, transparent 60%),
+
       radial-gradient(ellipse 60% 50% at 90% 80%, rgba(236,72,153,.18) 0%, transparent 55%),
+
       radial-gradient(ellipse 50% 40% at 10% 90%, rgba(56,189,248,.15) 0%, transparent 50%);
+
     z-index: -1;
+
     animation: bgPulse 8s ease-in-out infinite alternate;
+
   }
+
   @keyframes bgPulse {
+
     0%   { opacity: .7; }
+
     100% { opacity: 1; }
+
   }
 
   /* ── Header ────────────────────────────────────── */
+
   header {
+
     text-align: center;
+
     padding: 2.5rem 1rem 1rem;
+
   }
+
   header h1 {
+
     font-weight: 900;
+
     font-size: 2.4rem;
+
     background: linear-gradient(135deg, #818cf8, #f472b6, #38bdf8);
+
     -webkit-background-clip: text;
+
     -webkit-text-fill-color: transparent;
+
     letter-spacing: -0.02em;
+
   }
+
   header p {
+
     margin-top: .4rem;
+
     color: #94a3b8;
+
     font-size: .95rem;
+
   }
 
   /* ── Card / Panel ──────────────────────────────── */
+
   .card {
+
     background: rgba(255,255,255,.04);
+
     border: 1px solid rgba(255,255,255,.08);
+
     backdrop-filter: blur(18px);
+
     border-radius: 1.2rem;
+
     padding: 2rem;
+
     width: min(92vw, 480px);
+
     margin: 1.5rem auto;
+
     box-shadow: 0 8px 40px rgba(0,0,0,.35);
+
     transition: transform .3s, box-shadow .3s;
+
   }
+
   .card:hover {
+
     transform: translateY(-2px);
+
     box-shadow: 0 12px 48px rgba(99,102,241,.15);
+
   }
 
   /* ── Form ───────────────────────────────────────── */
+
   label {
+
     display: block;
+
     font-weight: 600;
+
     font-size: .85rem;
+
     color: #a5b4fc;
+
     margin-bottom: .35rem;
+
     text-transform: uppercase;
+
     letter-spacing: .06em;
+
   }
+
   input[type="number"], input[type="text"] {
+
     width: 100%;
+
     padding: .65rem .85rem;
+
     border: 1px solid rgba(255,255,255,.12);
+
     border-radius: .6rem;
+
     background: rgba(255,255,255,.06);
+
     color: #e8e8f0;
+
     font-family: inherit;
+
     font-size: 1rem;
+
     outline: none;
+
     transition: border-color .25s, box-shadow .25s;
+
     margin-bottom: 1rem;
+
   }
+
   input:focus {
+
     border-color: #818cf8;
+
     box-shadow: 0 0 0 3px rgba(129,140,248,.25);
+
   }
 
   button {
+
     display: inline-flex;
+
     align-items: center;
+
     justify-content: center;
+
     gap: .45rem;
+
     font-family: inherit;
+
     font-weight: 700;
+
     font-size: .95rem;
+
     border: none;
+
     border-radius: .65rem;
+
     padding: .7rem 1.6rem;
+
     cursor: pointer;
+
     transition: transform .18s, box-shadow .22s, background .22s;
+
   }
+
   button:active { transform: scale(.96); }
+
   .btn-primary {
+
     background: linear-gradient(135deg, #6366f1, #a855f7);
+
     color: #fff;
+
     box-shadow: 0 4px 20px rgba(99,102,241,.35);
+
   }
+
   .btn-primary:hover {
+
     box-shadow: 0 6px 28px rgba(99,102,241,.5);
+
   }
+
   .btn-secondary {
+
     background: rgba(255,255,255,.08);
+
     color: #c4b5fd;
+
     border: 1px solid rgba(255,255,255,.12);
+
   }
+
   .btn-secondary:hover {
+
     background: rgba(255,255,255,.13);
+
   }
+
   .btn-spin {
+
     background: linear-gradient(135deg, #f59e0b, #ef4444);
+
     color: #fff;
+
     font-size: 1.15rem;
+
     padding: .85rem 2.4rem;
+
     box-shadow: 0 4px 24px rgba(245,158,11,.4);
+
     margin-top: 1rem;
+
   }
+
   .btn-spin:hover {
+
     box-shadow: 0 6px 32px rgba(245,158,11,.55);
+
   }
+
   .btn-spin:disabled {
+
     opacity: .5;
+
     cursor: not-allowed;
+
   }
 
   #playerNamesArea {
+
     max-height: 260px;
+
     overflow-y: auto;
+
     padding-right: .3rem;
+
   }
+
   #playerNamesArea::-webkit-scrollbar { width: 5px; }
+
   #playerNamesArea::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 
   .actions { display: flex; gap: .75rem; margin-top: .5rem; }
 
   /* ── Spinner Area ──────────────────────────────── */
+
   #spinnerSection {
+
     display: none;
+
     flex-direction: column;
+
     align-items: center;
+
     padding: 1rem;
+
   }
 
   .wheel-wrapper {
+
     position: relative;
+
     width: 420px; height: 420px;
+
     margin: 0 auto;
+
   }
+
   @media (max-width: 500px) {
+
     .wheel-wrapper { width: 92vw; height: 92vw; }
+
   }
 
   canvas#wheelCanvas {
+
     width: 100%; height: 100%;
+
     border-radius: 50%;
+
     filter: drop-shadow(0 0 28px rgba(99,102,241,.3));
+
   }
 
-  /* Selector triangles rendered via JS – container */
   .selectors-ring {
+
     position: absolute;
+
     inset: 0;
+
     pointer-events: none;
-  }
-  .selector-arrow {
-    position: absolute;
-    width: 0; height: 0;
-    /* triangle pointing inward */
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 22px solid #facc15;
-    filter: drop-shadow(0 0 6px rgba(250,204,21,.7));
-    transform-origin: center top;
-    transition: filter .3s;
-  }
-  .selector-arrow.highlight {
-    filter: drop-shadow(0 0 14px #facc15);
-    border-top-color: #fde047;
+
   }
 
-  /* Results */
+  .selector-arrow {
+
+    position: absolute;
+
+    width: 0; height: 0;
+
+    border-left: 10px solid transparent;
+
+    border-right: 10px solid transparent;
+
+    border-top: 22px solid #facc15;
+
+    filter: drop-shadow(0 0 6px rgba(250,204,21,.7));
+
+    transform-origin: center top;
+
+    transition: filter .3s;
+
+  }
+
+  .selector-arrow.highlight {
+
+    filter: drop-shadow(0 0 14px #facc15);
+
+    border-top-color: #fde047;
+
+  }
+
   #resultsCard {
+
     display: none;
+
     text-align: center;
+
   }
+
   #resultsCard h2 {
+
     font-size: 1.5rem;
+
     margin-bottom: .8rem;
+
     background: linear-gradient(135deg, #facc15, #f97316);
+
     -webkit-background-clip: text;
+
     -webkit-text-fill-color: transparent;
+
   }
+
   .result-chip {
+
     display: inline-block;
+
     background: rgba(250,204,21,.12);
+
     border: 1px solid rgba(250,204,21,.3);
+
     color: #fde68a;
+
     padding: .4rem 1rem;
+
     border-radius: 2rem;
+
     margin: .3rem .2rem;
+
     font-weight: 600;
+
     font-size: .95rem;
+
     animation: chipIn .4s ease both;
+
   }
+
   @keyframes chipIn {
+
     from { opacity: 0; transform: scale(.7) translateY(8px); }
+
     to   { opacity: 1; transform: scale(1) translateY(0); }
+
   }
 
   .hidden { display: none !important; }
 
-  /* ── Confetti ───────────────────────────────────── */
   .confetti-piece {
+
     position: fixed;
+
     width: 8px; height: 14px;
+
     border-radius: 2px;
+
     opacity: 0;
+
     animation: confettiFall 2.2s ease-out forwards;
+
     z-index: 999;
+
     pointer-events: none;
+
   }
+
   @keyframes confettiFall {
+
     0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+
     100% { opacity: 0; transform: translateY(105vh) rotate(720deg); }
+
   }
+
 </style>
+
 </head>
+
 <body>
 
 <header>
+
   <h1>🎡 Spinner Wheel</h1>
+
   <p>Enter players, set selectors, and spin to pick!</p>
+
 </header>
 
-<!-- ─── SETUP CARD ─────────────────────────────── -->
 <div class="card" id="setupCard">
+
   <div id="step1">
+
     <label for="numPlayers">Number of Players (m)</label>
+
     <input type="number" id="numPlayers" min="2" max="30" placeholder="e.g. 6" value="">
+
     <button class="btn-primary" id="btnSetPlayers" onclick="setPlayers()">Next →</button>
+
   </div>
 
   <div id="step2" class="hidden">
+
     <label>Player Names</label>
+
     <div id="playerNamesArea"></div>
+
     <div style="margin-top:.8rem">
+
       <label for="numSelectors">Number of Selectors (n)</label>
+
       <input type="number" id="numSelectors" min="1" max="20" placeholder="e.g. 2" value="">
+
     </div>
+
     <div class="actions">
+
       <button class="btn-secondary" onclick="goBack()">← Back</button>
+
       <button class="btn-primary" id="btnStart" onclick="startSpinner()">Build Spinner 🎯</button>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- ─── SPINNER SECTION ────────────────────────── -->
 <section id="spinnerSection">
+
   <div class="wheel-wrapper" id="wheelWrapper">
+
     <canvas id="wheelCanvas" width="840" height="840"></canvas>
+
     <div class="selectors-ring" id="selectorsRing"></div>
+
   </div>
+
   <button class="btn-spin" id="btnSpin" onclick="spinWheel()">🎰 SPIN!</button>
+
   <div style="margin-top:.6rem">
+
     <button class="btn-secondary" onclick="resetAll()">↩ Reset</button>
+
   </div>
+
 </section>
 
-<!-- ─── RESULTS CARD ───────────────────────────── -->
 <div class="card" id="resultsCard">
+
   <h2>🏆 Selected Players</h2>
+
   <div id="resultsList"></div>
+
   <div class="actions" style="justify-content:center; margin-top:1rem;">
+
     <button class="btn-spin" onclick="spinWheel()">🎰 Spin Again</button>
+
     <button class="btn-secondary" onclick="resetAll()">↩ Reset</button>
+
   </div>
+
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════════════════ */
+
 let players = [];
 let numSelectors = 1;
-let currentAngle = 0;   // radians the wheel has rotated
+let currentAngle = 0;
 let spinning = false;
-let isFirstSpin = true;
 
 const COLORS = [
   '#6366f1','#a855f7','#ec4899','#f43f5e','#f97316',
@@ -318,9 +564,6 @@ const COLORS = [
   '#2dd4bf','#38bdf8','#818cf8','#c084fc','#fb7185'
 ];
 
-/* ═══════════════════════════════════════════════════
-   SETUP STEPS
-   ═══════════════════════════════════════════════════ */
 function setPlayers() {
   const m = parseInt(document.getElementById('numPlayers').value);
   if (!m || m < 2 || m > 30) { alert('Please enter a number between 2 and 30.'); return; }
@@ -350,70 +593,17 @@ function startSpinner() {
     alert(`Number of selectors must be between 1 and ${m}.`);
     return;
   }
+
   players = [];
   for (let i = 0; i < m; i++) {
     const name = document.getElementById(`pname_${i}`).value.trim() || `Player ${i + 1}`;
     players.push(name);
   }
-  
-  // Shuffle players array
+
+  // Shuffle players randomly (Fisher-Yates)
   for (let i = players.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [players[i], players[j]] = [players[j], players[i]];
-  }
-
-  // Collect rigged players
-  const riggedNamesLower = ['ryan', 'ryani', 'm', 'm','mrnatam'];
-  const presentRigged = [];
-  
-  for (let i = players.length - 1; i >= 0; i--) {
-    const pLower = players[i].toLowerCase();
-    if (riggedNamesLower.includes(pLower)) {
-      presentRigged.push(players[i]);
-      players.splice(i, 1);
-    }
-  }
-
-  if (presentRigged.length > 0) {
-    // Sort by priority (ryan > ryani > m)
-    presentRigged.sort((a, b) => {
-      const rank = p => {
-        const l = p.toLowerCase();
-        if (l === 'ryan') return 1;
-        if (l === 'ryani') return 2;
-        if (l === 'ne' || l === 'mrnatam') return 3;
-        return 4;
-      };
-      return rank(a) - rank(b);
-    });
-
-    const finalPlayers = new Array(m).fill(null);
-    
-    // Place rigged players at the correct indices for selectors
-    for (let i = 0; i < presentRigged.length; i++) {
-      if (i < n) {
-        let targetIndex = Math.floor(0.5 + i * m / n) % m;
-        while (finalPlayers[targetIndex] !== null) {
-          targetIndex = (targetIndex + 1) % m;
-        }
-        finalPlayers[targetIndex] = presentRigged[i];
-      }
-    }
-    
-    // Put any remaining rigged players into the unrigged pool
-    for (let i = n; i < presentRigged.length; i++) {
-      players.push(presentRigged[i]);
-    }
-    
-    // Fill the null slots with unrigged players
-    let pIdx = 0;
-    for (let i = 0; i < m; i++) {
-      if (finalPlayers[i] === null) {
-        finalPlayers[i] = players[pIdx++];
-      }
-    }
-    
-    players = finalPlayers;
   }
 
   numSelectors = n;
@@ -423,18 +613,16 @@ function startSpinner() {
   placeSelectors();
 }
 
-/* ═══════════════════════════════════════════════════
-   DRAW WHEEL (Canvas)
-   ═══════════════════════════════════════════════════ */
 function drawWheel(angle) {
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   const cx = W / 2, cy = H / 2, R = W / 2 - 16;
+
   ctx.clearRect(0, 0, W, H);
+
   const sliceAngle = (2 * Math.PI) / players.length;
 
-  // Outer glow ring
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, R + 8, 0, 2 * Math.PI);
@@ -448,7 +636,7 @@ function drawWheel(angle) {
   players.forEach((name, i) => {
     const start = angle + i * sliceAngle;
     const end = start + sliceAngle;
-    // Slice
+
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(cx, cy);
@@ -456,12 +644,11 @@ function drawWheel(angle) {
     ctx.closePath();
     ctx.fillStyle = COLORS[i % COLORS.length];
     ctx.fill();
-    // Border
     ctx.strokeStyle = 'rgba(0,0,0,.25)';
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
-    // Text
+
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(start + sliceAngle / 2);
@@ -474,7 +661,6 @@ function drawWheel(angle) {
     ctx.restore();
   });
 
-  // Center circle
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, 32, 0, 2 * Math.PI);
@@ -490,19 +676,16 @@ function drawWheel(angle) {
 
 function truncate(s, max) { return s.length > max ? s.slice(0, max - 1) + '…' : s; }
 
-/* ═══════════════════════════════════════════════════
-   SELECTORS (yellow arrows)
-   ═══════════════════════════════════════════════════ */
 function placeSelectors() {
   const ring = document.getElementById('selectorsRing');
   ring.innerHTML = '';
   const wrapper = document.getElementById('wheelWrapper');
   const size = wrapper.offsetWidth;
   const cx = size / 2, cy = size / 2;
-  const r = size / 2 + 4; // just outside the wheel
+  const r = size / 2 + 4;
 
   for (let i = 0; i < numSelectors; i++) {
-    const angleDeg = (360 / numSelectors) * i - 90; // start from top
+    const angleDeg = (360 / numSelectors) * i - 90;
     const angleRad = angleDeg * Math.PI / 180;
     const x = cx + r * Math.cos(angleRad);
     const y = cy + r * Math.sin(angleRad);
@@ -510,56 +693,34 @@ function placeSelectors() {
     const arrow = document.createElement('div');
     arrow.className = 'selector-arrow';
     arrow.dataset.index = i;
-    // Position
     arrow.style.left = `${x - 10}px`;
     arrow.style.top = `${y}px`;
-    // Rotate so it points toward center
     arrow.style.transform = `rotate(${angleDeg + 90}deg)`;
     ring.appendChild(arrow);
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   SPIN LOGIC
-   ═══════════════════════════════════════════════════ */
 function spinWheel() {
   if (spinning) return;
   spinning = true;
   document.getElementById('btnSpin').disabled = true;
   document.getElementById('resultsCard').style.display = 'none';
 
-  let targetAngle;
-  const hasRigged = players.some(p => ['ryan', 'ryani', 'm', 'mrnatam'].includes(p.toLowerCase()));
+  // Fully random spin — no rigging
+  const extraTurns = (5 + Math.random() * 5) * 2 * Math.PI;
+  const randomOffset = Math.random() * 2 * Math.PI;
+  const targetAngle = currentAngle + extraTurns + randomOffset;
 
-  if (isFirstSpin && hasRigged) {
-    const sliceAngle = (2 * Math.PI) / players.length;
-    // Add a tiny offset (-0.01) to ensure floating point division lands cleanly inside the desired slice
-    const desiredAngle = -Math.PI / 2 - (sliceAngle / 2) - 0.01;
-    const turns = Math.floor(5 + Math.random() * 5);
-    
-    let offset = (desiredAngle - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
-    if (offset < 0) offset += 2 * Math.PI;
-    
-    targetAngle = currentAngle + offset + turns * 2 * Math.PI;
-    isFirstSpin = false;
-  } else {
-    const extraTurns = (5 + Math.random() * 5) * 2 * Math.PI;
-    const randomOffset = Math.random() * 2 * Math.PI;
-    targetAngle = currentAngle + extraTurns + randomOffset;
-  }
-
-  const duration = 4000 + Math.random() * 1500; // 4-5.5s
+  const duration = 4000 + Math.random() * 1500;
   const startTime = performance.now();
   const startAngle = currentAngle;
 
   function animate(now) {
     let t = (now - startTime) / duration;
     if (t > 1) t = 1;
-    // Ease-out cubic
     const ease = 1 - Math.pow(1 - t, 3);
     currentAngle = startAngle + (targetAngle - startAngle) * ease;
     drawWheel(currentAngle);
-
     if (t < 1) {
       requestAnimationFrame(animate);
     } else {
@@ -568,12 +729,10 @@ function spinWheel() {
       showResults();
     }
   }
+
   requestAnimationFrame(animate);
 }
 
-/* ═══════════════════════════════════════════════════
-   RESULTS
-   ═══════════════════════════════════════════════════ */
 function showResults() {
   const sliceAngle = (2 * Math.PI) / players.length;
   const selected = new Set();
@@ -581,10 +740,7 @@ function showResults() {
 
   arrows.forEach(arrow => {
     const i = parseInt(arrow.dataset.index);
-    // Selector fixed angle (from top, clockwise)
     const selectorAngle = ((2 * Math.PI) / numSelectors) * i - Math.PI / 2;
-    // Which slice the selector points into
-    // The wheel has been rotated by currentAngle; we need the inverse
     let relAngle = (-currentAngle + selectorAngle) % (2 * Math.PI);
     if (relAngle < 0) relAngle += 2 * Math.PI;
     const index = Math.floor(relAngle / sliceAngle);
@@ -592,7 +748,6 @@ function showResults() {
     arrow.classList.add('highlight');
   });
 
-  // Build chips
   const list = document.getElementById('resultsList');
   list.innerHTML = '';
   let delay = 0;
@@ -607,14 +762,9 @@ function showResults() {
 
   document.getElementById('resultsCard').style.display = 'block';
   launchConfetti();
-
-  // Remove highlight after 2s
   setTimeout(() => arrows.forEach(a => a.classList.remove('highlight')), 2000);
 }
 
-/* ═══════════════════════════════════════════════════
-   CONFETTI
-   ═══════════════════════════════════════════════════ */
 function launchConfetti() {
   const colors = ['#facc15','#6366f1','#ec4899','#22c55e','#38bdf8','#f97316'];
   for (let i = 0; i < 80; i++) {
@@ -632,33 +782,26 @@ function launchConfetti() {
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   RESET
-   ═══════════════════════════════════════════════════ */
 function resetAll() {
-  // Shuffle the players array
   for (let i = players.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [players[i], players[j]] = [players[j], players[i]];
   }
-  
-  // Update input fields with the shuffled names
   for (let i = 0; i < players.length; i++) {
     const inp = document.getElementById(`pname_${i}`);
     if (inp) inp.value = players[i];
   }
-
-  isFirstSpin = true;
   currentAngle = 0;
   spinning = false;
   document.getElementById('spinnerSection').style.display = 'none';
   document.getElementById('resultsCard').style.display = 'none';
   document.getElementById('setupCard').classList.remove('hidden');
-  
-  // Go back to step 2 (names list) instead of step 1, so data is not lost
   document.getElementById('step1').classList.add('hidden');
   document.getElementById('step2').classList.remove('hidden');
 }
+
 </script>
+
 </body>
+
 </html>
