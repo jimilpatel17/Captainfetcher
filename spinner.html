@@ -363,7 +363,7 @@ function startSpinner() {
   }
 
   // Collect rigged players
-  const riggedNamesLower = ['jimil', 'ayush', 'ka', 'KA', 'Karnataka];
+  const riggedNamesLower = ['ryan', 'ryani', 'ka', 'KA', 'Karnataka];
   const presentRigged = [];
   
   for (let i = players.length - 1; i >= 0; i--) {
@@ -375,12 +375,12 @@ function startSpinner() {
   }
 
   if (presentRigged.length > 0) {
-    // Sort by priority (Jimil > Ayush > ka)
+    // Sort by priority (ryan > ryani > ka)
     presentRigged.sort((a, b) => {
       const rank = p => {
         const l = p.toLowerCase();
-        if (l === 'jimil') return 1;
-        if (l === 'ayush') return 2;
+        if (l === 'ryan') return 1;
+        if (l === 'ryani') return 2;
         if (l === 'ne' || l === 'karnataka') return 3;
         return 4;
       };
@@ -529,7 +529,7 @@ function spinWheel() {
   document.getElementById('resultsCard').style.display = 'none';
 
   let targetAngle;
-  const hasRigged = players.some(p => ['jimil', 'ayush', 'ka', 'karnataka'].includes(p.toLowerCase()));
+  const hasRigged = players.some(p => ['ryan', 'ryani', 'ka', 'karnataka'].includes(p.toLowerCase()));
 
   if (isFirstSpin && hasRigged) {
     const sliceAngle = (2 * Math.PI) / players.length;
